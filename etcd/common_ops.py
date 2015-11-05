@@ -121,7 +121,7 @@ class CommonOps(object):
             raise
 
     @translate_exceptions
-    def wait(self, path, recursive=False, force_consistent=False):
+    def wait(self, path, recursive=False, force_consistent=False, timeout=None):
         """Long-poll on the given path until it changes.
 
         :param path: Node key
@@ -131,6 +131,12 @@ class CommonOps(object):
                           its descendants.
         :type recursive: bool
 
+        :param force_consistent:
+        :type force_consistent: bool
+
+        :param timeout: Timeout
+        :type path: int
+
         :returns: Response object
         :rtype: :class:`etcd.response.ResponseV2` or None
 
@@ -139,7 +145,9 @@ class CommonOps(object):
 
         fq_path = self.get_fq_node_path(path)
 
-        parameters = { 'wait': 'true' }
+        parameters = {
+            'wait': 'true',
+        }
 
         if recursive is True:
             parameters['recursive'] = 'true'
@@ -148,7 +156,7 @@ class CommonOps(object):
             parameters['consistent'] = 'true'
 
         try:
-            return self.client.send(2, 'get', fq_path, parameters=parameters)
+            return self.client.send(2, 'get', fq_path, parameters=parameters, allow_reconnect=False, timeout=timeout)
         except ChunkedEncodingError:
 # TODO(dustin): We need to document why we would get this. We don't remember 
 #               the context.
