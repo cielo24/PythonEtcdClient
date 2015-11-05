@@ -199,7 +199,7 @@ class Client(object):
         return ('<ETCD %s>' % (self.__prefix))
 
     def send(self, version, verb, path, value=None, parameters=None, data=None, 
-             module=None, return_raw=False, allow_reconnect=True):
+             module=None, return_raw=False, allow_reconnect=True, timeout=None):
         """Build and execute a request.
 
         :param version: Version of API
@@ -233,6 +233,9 @@ class Client(object):
                                 the current host fails connection.
         :type allow_reconnect: bool
 
+        :param timeout: Connection timeout
+        :type timeout: int or None
+
         :returns: Response object
         :rtype: :class:`etcd.response.ResponseV2`
         """
@@ -257,10 +260,13 @@ class Client(object):
         if value is not None:
             data['value'] = value
 
-        args = { 'params': parameters, 
-                 'data': data, 
-                 'verify': self.__ssl_verify, 
-                 'cert': self.__ssl_cert }
+        args = {
+            'params': parameters,
+            'data': data,
+            'verify': self.__ssl_verify,
+            'cert': self.__ssl_cert,
+            'timeout': timeout,
+        }
 
         _logger.debug("Request(%s)=[%s] params=[%s] data_keys=[%s]",
                       verb, url, parameters, args['data'].keys())
