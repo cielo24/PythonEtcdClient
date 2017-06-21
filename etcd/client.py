@@ -116,7 +116,8 @@ class Client(object):
                  is_ssl=False, ssl_do_verify=_SSL_DO_VERIFY, 
                  ssl_ca_bundle_filepath=_SSL_CA_BUNDLE_FILEPATH, 
                  ssl_client_cert_filepath=_SSL_CLIENT_CRT_FILEPATH, 
-                 ssl_client_key_filepath=_SSL_CLIENT_KEY_FILEPATH):
+                 ssl_client_key_filepath=_SSL_CLIENT_KEY_FILEPATH,
+                 username=None, password=None):
 
         if ssl_do_verify is not None:
             _logger.debug("SSL: Explicit verify setting given: [%s]", ssl_do_verify)
@@ -157,6 +158,9 @@ class Client(object):
         _logger.debug("PREFIX= [%s]", self.__prefix)
 
         self.__session = requests.Session()
+        
+        if username and password:
+            self.__session.auth = (username, password, )
 
         # Define an adapter for when SSL is requested.
         self.__session.mount('https://', _Ssl3HttpAdapter())
